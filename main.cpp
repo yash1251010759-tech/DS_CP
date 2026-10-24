@@ -7,6 +7,76 @@ string name;
 vector<string> symptoms;
 };
 
+struct TreeNode{
+    string diseaseName;
+    TreeNode* left;
+    TreeNode *right;
+
+    TreeNode(string name){
+        diseaseName=name;
+        left = NULL;
+        right = NULL;
+    }
+};
+
+TreeNode* insertDisease(TreeNode* root, string name){
+    if(root == NULL){
+        return new TreeNode(name);
+    }
+    else if(name<root->diseaseName){
+        root->left= insertDisease(root->left,name);
+    }
+    else if(name>root->diseaseName){
+        root->right= insertDisease(root->right,name);
+    }
+
+    return root;
+}
+
+void inorderTraversal(TreeNode* root){
+    if(root == NULL){
+        return ;
+    }
+    inorderTraversal(root->left);
+    cout << root->diseaseName << endl;
+    inorderTraversal(root->right);
+}
+
+void preorderTraversal(TreeNode* root){
+    if(root == NULL){
+        return ;
+    }
+    cout << root->diseaseName << endl;
+    preorderTraversal(root->left);
+    
+    preorderTraversal(root->right);
+}
+
+void postorderTraversal(TreeNode* root){
+    if(root == NULL){
+        return ;
+    }
+    postorderTraversal(root->left);
+    postorderTraversal(root->right);
+    cout << root->diseaseName << endl;
+    
+}
+
+TreeNode* searchDiseaseBST(TreeNode* root,string name){
+    if(root == NULL){
+        return NULL;
+    }
+    else if(name == root->diseaseName){
+        return root;
+    }
+    else if(name< root->diseaseName){
+        return searchDiseaseBST(root->left,name);
+    }
+    else{
+        return searchDiseaseBST(root->right,name);
+    }
+}
+
 void addToHistory(string name);
 
 // structure of linked list
@@ -345,7 +415,13 @@ void topKsymptoms(vector<Disease>& diseases){
        cin >> k;
 
        cout << endl;
+       if (k <= 0) {
+        cout << "K must be positive.\n";
+        return;
+        }
 
+        k = min(k, (int)ans.size()); 
+        
        for(int i=0;i<k;i++){
         cout << ans[i].first << " : " << ans[i].second << " diseases\n" ;
        }
@@ -388,6 +464,12 @@ vector<Disease> diseases = {
     {"Disease E", {"Cough", "Fatigue", "Headache"}}
 };
 
+TreeNode* root=NULL;
+
+for(int i=0;i<diseases.size();i++){
+    root = insertDisease(root,diseases[i].name);
+}
+
 int choice;
 
 do {
@@ -408,7 +490,11 @@ do {
     cout << "10. Sort Symptoms\n";
     cout << "11. Top K symptoms\n";
     cout << "12. View recent search history\n";
-    cout << "13. Exit\n";
+    cout << "13. BST Inorder Traversal\n";
+    cout << "14. BST Preorder Traversal\n";
+    cout << "15. BST Postorder Traversal\n";
+    cout << "16. Search Disease Using BST\n";
+    cout << "17. Exit\n";
 
     cout << "\nEnter your choice: ";
 
@@ -470,15 +556,44 @@ do {
             break;
 
         case 13:
+            inorderTraversal(root);
+            break;
+        
+        case 14:
+            preorderTraversal(root);
+            break;
+
+        case 15:
+            postorderTraversal(root);
+            break;
+        
+        case 16:{
+            string name;
+            cout << "Enter the disease name to search : ";
+            cin.ignore(numeric_limits<streamsize>::max(),'\n');
+            getline(cin,name);
+
+            TreeNode* result=searchDiseaseBST(root,name);
+
+            if(result != NULL){
+                cout << "Disease found: " << result->diseaseName << endl;
+            }
+            else{
+                cout << "Disease not found in BST.\n";
+            }
+            break;
+        }
+
+        case 17:
             cout << "\nThank you for using the analyzer!\n";
             break;
 
 
         default:
-            cout << "\nInvalid choice! Select between 1 and 13.\n";
+            cout << "\nInvalid choice! Select between 1 and 17.\n";
     }
 
-} while (choice != 13);
+} while (choice != 17);
 
 return 0;  
 
